@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <title>PhotoStack</title>
+    <script type="text/javascript" src="http://www.sand-labs.org/owb/browser/trunk/WebKitSite/misc/WebKitDetect.js?rev=414&format=txt"></script>
+    <script type="text/javascript" src=""></script>
+    <style type="text/css" media="screen">
+img.pic {
+  position: absolute;
+  border: 5px solid white;
+
+  opacity: 0;
+  -webkit-transform: rotate(75deg) scale(2);
+
+  -webkit-transition-property: opacity, -webkit-transform;
+  -webkit-transition-duration: 1s, 2s;
+
+  -webkit-box-shadow: rgb(0, 0, 0) 0.2em 0.2em 1em;
+}
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+    </style>
+
+    <script type="text/javascript">
+function init(){
+   const isIPhone = WebKitDetect.isMobile();
+   const numOfvisiblePics = isIPhone ? 10 : 50;
+   const scaleGoal = isIPhone ? 1.6 : 1;
+   const url = "";
+   var idx = 0;
+   var numOfPics = fileList.length;
+   var picArray = [];
+
+   function shave(num){
+      return Math.round(num*100)/100;
+   }
+
+   function preparePic(){
+      var pic = picArray[idx];
+      pic = document.createElement("img");
+      pic.className = "pic";
+      pic.src = url + fileList[idx % numOfPics];
+      pic.setAttribute("name", "pic"+idx);
+      pic.style.top  = shave(Math.random()) * (window.innerHeight - 400);
+      pic.style.left = shave(Math.random()) * (window.innerWidth - 400);
+      pic.style.visible = false;
+      picArray[picArray.length] = pic;
+      document.body.appendChild(pic);
+   }
+
+   function show(){
+      idx += 1;
+      preparePic();
+
+      if (idx > numOfvisiblePics) {
+         document.body.removeChild(picArray[idx-numOfvisiblePics]);
+         picArray[idx-numOfvisiblePics] = undefined;
+      }
+
+      setTimeout(function(){
+         var pic = picArray[idx-1];
+         pic.style.visible = true;
+         pic.style.opacity = 1;
+         pic.style.webkitTransform =
+            'rotate('+ (shave(Math.random()*40)-20)+'deg)'+
+            'scale('+scaleGoal+')';
+         var isSecoundTime = false;
+         pic.addEventListener('webkitTransitionEnd', function(e){
+            if (isSecoundTime) {
+               setTimeout(show, 0);
+            } else {
+               isSecoundTime = true;
+            }
+         },false);
+      },0);
+   }
+
+   preparePic();
+   show();
+}
+    </script>
+  </head>
+  <body onload="init()" bgcolor="black">
+  </body>
+</html>
